@@ -9,7 +9,16 @@ jobs:
     runs-on: ubuntu-latest
     # Environment where integration variables are stored
     environment: develop
+    # Add "id-token" with the intended permissions.
+    permissions:
+      contents: 'read'
+      id-token: 'write'
     steps:
+      - id: auth
+        uses: 'google-github-actions/auth@v2'
+        with:
+          workload_identity_provider: ${{ secrets.CI_WORKLOAD_PROVIDER }}
+          service_account: ${{ secrets.CI_SERVICE_ACCOUNT }}
       - name: check out code
         uses: actions/checkout@v4
       - name: Set up Python
