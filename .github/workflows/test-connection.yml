@@ -49,5 +49,7 @@ jobs:
           service_account: ${{ secrets.CI_SERVICE_ACCOUNT }}
       # run tests
       - name: Run integration tests
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.auth.outputs.credentials_file_path }}
         # Add the -vvv flag to print out more output
-        run: echo "${{ steps.auth.outputs.credentials_file_path }}"; ansible-test integration -v --color --python ${{ env.PYTHON_VERSION }} gcp_billing_account_iam
+        run: ansible-test integration -v --color --python ${{ env.PYTHON_VERSION }} gcp_billing_account_iam
