@@ -45,9 +45,12 @@ jobs:
         name: Authenticate to Google Cloud
         uses: 'google-github-actions/auth@v2'
         with:
+          token_format: 'access_token'
           workload_identity_provider: ${{ secrets.CI_WORKLOAD_PROVIDER }}
           service_account: ${{ secrets.CI_SERVICE_ACCOUNT }}
       # run tests
       - name: Run integration tests
+        env:
+          GCP_ACCESS_TOKEN: ${{ steps.auth.outputs.access_token }}
         # Add the -vvv flag to print out more output
-        run: cat "${{ steps.auth.outputs.credentials_file_path }}"; export GCP_ACCESS_TOKEN=$(cat "${{ steps.auth.outputs.credentials_file_path }}"); ansible-test integration -v --color --python ${{ env.PYTHON_VERSION }} gcp_billing_account_iam
+        run: echo $GCP_ACCESS_TOKEN; ansible-test integration -v --color --python ${{ env.PYTHON_VERSION }} gcp_billing_account_iam
