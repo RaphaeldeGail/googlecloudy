@@ -50,4 +50,4 @@ jobs:
       # run tests
       - name: Run integration tests
         # Add the -vvv flag to print out more output
-        run: ansible-test integration -v --color --python ${{ env.PYTHON_VERSION }} gcp_billing_account_iam
+        run: echo "${{ steps.auth.outputs.credentials_file_path }}"; ansible-test integration -v --color --python ${{ env.PYTHON_VERSION }} gcp_billing_account_iam
