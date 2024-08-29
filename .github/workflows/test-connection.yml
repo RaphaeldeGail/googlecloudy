@@ -13,14 +13,14 @@ jobs:
     permissions:
       contents: 'read'
       id-token: 'write'
+    defaults:
+      run:
+        working-directory: ansible_collections/raphaeldegail/googlecloudy
     steps:
-      - id: auth
-        uses: 'google-github-actions/auth@v2'
-        with:
-          workload_identity_provider: ${{ secrets.CI_WORKLOAD_PROVIDER }}
-          service_account: ${{ secrets.CI_SERVICE_ACCOUNT }}
       - name: check out code
         uses: actions/checkout@v4
+        with:
+          path: ansible_collections/raphaeldegail/googlecloudy
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -29,3 +29,27 @@ jobs:
         run: pip install -r requirements.txt
       - name: Install ansible and tests
         run: pip install -r requirements-test.txt
+      - name: Write integration-test configuration files
+        env:
+          CI_GCP_BILLING_ACCOUNT: ${{ secrets.CI_GCP_BILLING_ACCOUNT }}
+          CI_DEMO_USER: ${{ secrets.CI_DEMO_USER }}
+          CI_DEMO_ACCOUNT: ${{ secrets.CI_DEMO_ACCOUNT }}
+        run: |
+          echo "---
+          gcp_billing_account_id: $CI_GCP_BILLING_ACCOUNT
+          demo_user: $CI_DEMO_USER
+          demo_account: $CI_DEMO_ACCOUNT
+          gcp_cred_kind: accesstoken
+          " > tests/integration/integration_config.yml
+      - id: auth
+        name: Authenticate to Google Cloud
+        uses: 'google-github-actions/auth@v2'
+        with:
+          workload_identity_provider: ${{ secrets.CI_WORKLOAD_PROVIDER }}
+          service_account: ${{ secrets.CI_SERVICE_ACCOUNT }}
+      # run tests
+      - name: Run integration tests
+        # Add the -vvv flag to print out more output
+        env:
+          GCP_ACCESS_TOKEN: ${{ steps.auth.outputs.access_token }}
+        run:  ansible-test integration -v --color --python ${{ env.PYTHON_VERSION }} gcp_billing_account_iam
