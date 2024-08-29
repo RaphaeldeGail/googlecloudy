@@ -1,0 +1,122 @@
+#----------------------------------------------------------
+- name: Check IAM policy
+  raphaeldegail.googlecloudy.gcp_resourcemanager_organization_iam_info:
+    organization_id: '{{ org_id }}'
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+  register: tmp_results
+- name: Verify that command succeeded
+  ansible.builtin.assert:
+    that:
+      - "tmp_results['bindings'] is defined"
+- name: Remove the extra binding from the policy if it exists
+  raphaeldegail.googlecloudy.gcp_resourcemanager_organization_iam:
+    bindings: '{{ results.bindings | difference(extra_binding) }}'
+    policy_version: '1'
+    organization_id: '{{ org_id }}'
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+  vars:
+    extra_binding:
+      - role: 'roles/resourcemanager.folderViewer'
+        members:
+          - 'serviceAccount:{{ demo_account }}'
+  when: (tmp_results.bindings | intersect(extra_binding) | length) > 0
+- name: Check again IAM policy
+  raphaeldegail.googlecloudy.gcp_resourcemanager_organization_iam_info:
+    organization_id: '{{ org_id }}'
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+  register: results
+#-----------------------------------------------------------------------------
+- name: DEBUG
+  ansible.builtin.debug:
+    msg: '{{ results.bindings | union(extra_binding) }}'
+  vars:
+    extra_binding:
+      - role: 'roles/resourcemanager.folderViewer'
+        members:
+          - 'serviceAccount:{{ demo_account }}'
+- name: Add a binding to the policy
+  raphaeldegail.googlecloudy.gcp_resourcemanager_organization_iam:
+    bindings: '{{ results.bindings | union(extra_binding) }}'
+    policy_version: '1'
+    organization_id: '{{ org_id }}'
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+  register: result
+  vars:
+    extra_binding:
+      - role: 'roles/resourcemanager.folderViewer'
+        members:
+          - 'serviceAccount:{{ demo_account }}'
+- name: DEBUG
+  ansible.builtin.debug:
+    var: result
+- name: Assert changed is true
+  ansible.builtin.assert:
+    that:
+      - result.changed == true
+      - (result.bindings | length) > (results.bindings | length)
+#----------------------------------------------------------------------------
+- name: Check policy was updated
+  raphaeldegail.googlecloudy.gcp_resourcemanager_organization_iam_info:
+    organization_id: '{{ org_id }}'
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+  register: new_results
+- name: DEBUG
+  ansible.builtin.debug:
+    var: new_results
+- name: Verify that update succeeded
+  ansible.builtin.assert:
+    that:
+      - (new_results['bindings'][0]['members'] | length) > 0
+#-------------------------------------------------------------------------------
+- name: Reapply the same policy
+  raphaeldegail.googlecloudy.gcp_resourcemanager_organization_iam:
+    bindings: '{{ new_results.bindings }}'
+    policy_version: '1'
+    organization_id: '{{ org_id }}'
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+  register: result
+- name: DEBUG
+  ansible.builtin.debug:
+    var: result
+- name: Assert changed is false
+  ansible.builtin.assert:
+    that:
+      - result.changed == false
+      - result.bindings == new_results.bindings
+#----------------------------------------------------------------------------
+- name: Remove the binding from the policy
+  raphaeldegail.googlecloudy.gcp_resourcemanager_organization_iam:
+    bindings: '{{ results.bindings }}'
+    policy_version: '1'
+    organization_id: '{{ org_id }}'
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+  register: result
+- name: DEBUG
+  ansible.builtin.debug:
+    var: result
+- name: Assert changed is true
+  ansible.builtin.assert:
+    that:
+      - result.changed == true
+      - result.bindings == results.bindings
+#----------------------------------------------------------------------------
+- name: Check policy is back to original
+  raphaeldegail.googlecloudy.gcp_resourcemanager_organization_iam_info:
+    organization_id: '{{ org_id }}'
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+  register: final_results
+- name: DEBUG
+  ansible.builtin.debug:
+    var: final_results
+- name: Verify that update succeeded
+  ansible.builtin.assert:
+    that:
+      - final_results.bindings == results.bindings

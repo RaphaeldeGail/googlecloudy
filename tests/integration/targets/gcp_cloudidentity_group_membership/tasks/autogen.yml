@@ -1,0 +1,135 @@
+# Pre-test setup
+- name: Delete any group membership
+  raphaeldegail.googlecloudy.gcp_cloudidentity_group_membership:
+    preferred_member_key:
+      id: '{{ demo_user }}'
+    group_id: '{{ (tmp_group.name | split("/"))[-1]  }}'
+    state: absent
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+#----------------------------------------------------------
+- name: Create a group membership
+  raphaeldegail.googlecloudy.gcp_cloudidentity_group_membership:
+    preferred_member_key:
+      id: '{{ demo_user }}'
+    roles:
+    - name: MEMBER
+    - name: MANAGER
+    group_id: '{{ (tmp_group.name | split("/"))[-1]  }}'
+    state: present
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+  register: result
+- name: Assert changed is true
+  ansible.builtin.assert:
+    that:
+      - result.changed == true
+      - result.preferredMemberKey.id == '{{ demo_user }}'
+      - result.roles | length == 2
+- name: Verify that the membership was created
+  raphaeldegail.googlecloudy.gcp_cloudidentity_group_membership_info:
+    name: '{{ result.name }}'
+    group_id: '{{ (tmp_group.name | split("/"))[-1]  }}'
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+  register: results
+- name: Verify that command succeeded
+  ansible.builtin.assert:
+    that:
+      - "results['name'] is defined"
+      - results.preferredMemberKey.id == '{{ demo_user }}'
+#-----------------------------------------------------------------------------
+- name: Create an already existing group membership
+  raphaeldegail.googlecloudy.gcp_cloudidentity_group_membership:
+    preferred_member_key:
+      id: '{{ demo_user }}'
+    roles:
+    - name: MEMBER
+    - name: MANAGER
+    group_id: '{{ (tmp_group.name | split("/"))[-1]  }}'
+    state: present
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+  register: result
+- name: Assert changed is false
+  ansible.builtin.assert:
+    that:
+      - result.changed == false
+      - result.preferredMemberKey.id == '{{ demo_user }}'
+      - result.roles | length == 2
+# ----------------------------------------------------------------------------
+- name: Update the group membership
+  raphaeldegail.googlecloudy.gcp_cloudidentity_group_membership:
+    preferred_member_key:
+      id: '{{ demo_user }}'
+    roles:
+    - name: MEMBER
+    - name: OWNER
+    group_id: '{{ (tmp_group.name | split("/"))[-1]  }}'
+    state: present
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+  register: result
+- name: Assert changed is true
+  ansible.builtin.assert:
+    that:
+      - result.changed == true
+      - result.preferredMemberKey.id == '{{ demo_user }}'
+      - result.roles | length == 2
+# ----------------------------------------------------------------------------
+- name: Check policy was updated
+  raphaeldegail.googlecloudy.gcp_cloudidentity_group_membership_info:
+    name: '{{ result.name }}'
+    group_id: '{{ (tmp_group.name | split("/"))[-1]  }}'
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+  register: results
+- name: Verify that update succeeded
+  ansible.builtin.assert:
+    that:
+      - "results['name'] is defined"
+      - results.preferredMemberKey.id == '{{ demo_user }}'
+      - results.roles[0].name == 'MEMBER' or results.roles[0].name == 'OWNER'
+# ----------------------------------------------------------------------------
+- name: Delete the group membership
+  raphaeldegail.googlecloudy.gcp_cloudidentity_group_membership:
+    preferred_member_key:
+      id: '{{ demo_user }}'
+    group_id: '{{ (tmp_group.name | split("/"))[-1]  }}'
+    state: absent
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+  register: result
+- name: Assert changed is true
+  ansible.builtin.assert:
+    that:
+      - result.changed == true
+      - "result.preferredMemberKey is undefined"
+# ----------------------------------------------------------------------------
+- name: Check the group is absent
+  raphaeldegail.googlecloudy.gcp_cloudidentity_group_membership_info:
+    preferred_member_key:
+      id: '{{ demo_user }}'
+    group_id: '{{ (tmp_group.name | split("/"))[-1]  }}'
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+  register: results
+- name: Verify that deletion succeeded
+  ansible.builtin.assert:
+    that:
+      - "results.name is undefined"
+# ----------------------------------------------------------------------------
+- name: Delete an inexistant group membership
+  raphaeldegail.googlecloudy.gcp_cloudidentity_group_membership:
+    preferred_member_key:
+      id: '{{ demo_user }}'
+    group_id: '{{ (tmp_group.name | split("/"))[-1]  }}'
+    state: absent
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+  register: result
+- name: Assert changed is false
+  ansible.builtin.assert:
+    that:
+      - result.changed == false
+      - "result.preferredMemberKey is undefined"

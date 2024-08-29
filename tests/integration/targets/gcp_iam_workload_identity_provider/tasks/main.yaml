@@ -1,0 +1,6 @@
+---
+- name: set a random name
+  ansible.builtin.set_fact:
+    provider_name: 'demo-provider-{{ 9999 | random }}'
+- name: Generated tests
+  ansible.builtin.include_tasks: autogen.yml

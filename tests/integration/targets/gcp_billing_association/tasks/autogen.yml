@@ -1,0 +1,50 @@
+# Pre-test setup
+- name: Remove any billing account from project
+  raphaeldegail.googlecloudy.gcp_billing_association:
+    project_id: '{{ project_id }}'
+    billing_account_id: ''
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+#----------------------------------------------------------
+- name: Set the billing account for a project
+  raphaeldegail.googlecloudy.gcp_billing_association:
+    project_id: '{{ project_id }}'
+    billing_account_id: "{{ gcp_billing_account_id }}"
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+  register: result
+- name: Assert changed is true
+  ansible.builtin.assert:
+    that:
+      - result.changed == true
+      - result.billingAccountName == 'billingAccounts/{{ gcp_billing_account_id }}'
+- name: Verify that the association was succesful
+  raphaeldegail.googlecloudy.gcp_billing_association_info:
+    project_id: '{{ project_id }}'
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+  register: results
+- name: Verify that command succeeded
+  ansible.builtin.assert:
+    that:
+      - results.billingAccountName == 'billingAccounts/{{ gcp_billing_account_id }}'
+#-----------------------------------------------------------------------------
+- name: Set the billing account for an already linked project
+  raphaeldegail.googlecloudy.gcp_billing_association:
+    project_id: '{{ project_id }}'
+    billing_account_id: "{{ gcp_billing_account_id }}"
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+  register: result
+- name: Assert changed is false
+  ansible.builtin.assert:
+    that:
+      - result.changed == false
+      - result.billingAccountName == 'billingAccounts/{{ gcp_billing_account_id }}'
+# ----------------------------------------------------------------------------
+- name: Revoke the association after tests
+  raphaeldegail.googlecloudy.gcp_billing_association:
+    project_id: '{{ project_id }}'
+    billing_account_id: ''
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"

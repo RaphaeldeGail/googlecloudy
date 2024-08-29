@@ -1,0 +1,24 @@
+---
+- name: Create a Google group fot the tests
+  raphaeldegail.googlecloudy.gcp_cloudidentity_group:
+    group_key:
+      id: '{{ demo_group }}'
+    parent: 'customers/{{ customer_directory_id }}'
+    labels:
+      cloudidentity.googleapis.com/groups.discussion_forum: ''
+    state: present
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+  register: tmp_group
+- name: Generated tests
+  ansible.builtin.include_tasks: autogen.yml
+- name: Delete the group after the tests
+  raphaeldegail.googlecloudy.gcp_cloudidentity_group:
+    group_key:
+      id: '{{ demo_group }}'
+    parent: 'customers/{{ customer_directory_id }}'
+    labels:
+      cloudidentity.googleapis.com/groups.discussion_forum: ''
+    state: absent
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"

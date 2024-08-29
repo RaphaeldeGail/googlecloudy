@@ -1,0 +1,145 @@
+# Pre-test setup
+- name: Delete a role
+  raphaeldegail.googlecloudy.gcp_iam_organization_role:
+    name: demo.role
+    included_permissions:
+    - iam.roles.list
+    - iam.roles.get
+    stage: BETA
+    organization_id: '{{ org_id }}'
+    state: absent
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+#----------------------------------------------------------
+- name: Create a role
+  raphaeldegail.googlecloudy.gcp_iam_organization_role:
+    name: demo.role
+    included_permissions:
+    - iam.roles.list
+    - iam.roles.get
+    stage: BETA
+    organization_id: '{{ org_id }}'
+    state: present
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+  register: result
+- name: Assert changed is true
+  ansible.builtin.assert:
+    that:
+      - result.changed == true
+      - "'iam.roles.list' in result.includedPermissions"
+- name: Verify that the binding was succesful
+  raphaeldegail.googlecloudy.gcp_iam_organization_role_info:
+    name: demo.role
+    organization_id: '{{ org_id }}'
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+  register: results
+- name: Verify that command succeeded
+  ansible.builtin.assert:
+    that:
+      - "'iam.roles.list' in results.includedPermissions"
+      - results.stage == 'BETA'
+#-----------------------------------------------------------------------------
+- name: Create an already existing role
+  raphaeldegail.googlecloudy.gcp_iam_organization_role:
+    name: demo.role
+    included_permissions:
+    - iam.roles.list
+    - iam.roles.get
+    stage: BETA
+    organization_id: '{{ org_id }}'
+    state: present
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+  register: result
+- name: Assert changed is false
+  ansible.builtin.assert:
+    that:
+      - result.changed == false
+      - "'iam.roles.list' in result.includedPermissions"
+# ----------------------------------------------------------------------------
+- name: Update the role
+  raphaeldegail.googlecloudy.gcp_iam_organization_role:
+    name: demo.role
+    title: 'Demo Role'
+    included_permissions:
+    - iam.roles.list
+    - iam.roles.get
+    - iam.roles.update
+    stage: BETA
+    organization_id: '{{ org_id }}'
+    state: present
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+  register: result
+- name: Assert changed is true
+  ansible.builtin.assert:
+    that:
+      - result.changed == true
+      - "'iam.roles.list' in result.includedPermissions"
+      - result.title == 'Demo Role'
+# ----------------------------------------------------------------------------
+- name: Check the role was updated
+  raphaeldegail.googlecloudy.gcp_iam_organization_role_info:
+    name: demo.role
+    organization_id: '{{ org_id }}'
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+  register: results
+- name: Verify that update succeeded
+  ansible.builtin.assert:
+    that:
+      - "'iam.roles.list' in results.includedPermissions"
+      - results.stage == 'BETA'
+      - results.title == 'Demo Role'
+# ----------------------------------------------------------------------------
+- name: Delete the role
+  raphaeldegail.googlecloudy.gcp_iam_organization_role:
+    name: demo.role
+    title: 'Demo Role'
+    included_permissions:
+    - iam.roles.list
+    - iam.roles.get
+    - iam.roles.update
+    stage: BETA
+    organization_id: '{{ org_id }}'
+    state: absent
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+  register: result
+- name: Assert changed is true
+  ansible.builtin.assert:
+    that:
+      - result.changed == true
+# ----------------------------------------------------------------------------
+- name: Check the role is deleted
+  raphaeldegail.googlecloudy.gcp_iam_organization_role_info:
+    name: demo.role
+    organization_id: '{{ org_id }}'
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+  register: results
+- name: Verify that deletion succeeded
+  ansible.builtin.assert:
+    that:
+      - results.deleted == true
+# ----------------------------------------------------------------------------
+- name: Delete an inexistant role
+  raphaeldegail.googlecloudy.gcp_iam_organization_role:
+    name: demo.role
+    title: 'Demo Role'
+    included_permissions:
+    - iam.roles.list
+    - iam.roles.get
+    - iam.roles.update
+    stage: BETA
+    organization_id: '{{ org_id }}'
+    state: absent
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+  register: result
+- name: Assert changed is false
+  ansible.builtin.assert:
+    that:
+      - result.changed == false

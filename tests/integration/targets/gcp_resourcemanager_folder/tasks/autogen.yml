@@ -1,0 +1,89 @@
+# Pre-test setup
+- name: Set a random name for the folder
+  ansible.builtin.set_fact:
+    folder_name: 'demofold{{ 9999 | random }}'
+#----------------------------------------------------------
+- name: Create a folder
+  raphaeldegail.googlecloudy.gcp_resourcemanager_folder:
+    parent: 'organizations/{{ org_id }}'
+    display_name: '{{ folder_name }}'
+    state: present
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+  register: result
+- name: Assert changed is true
+  ansible.builtin.assert:
+    that:
+      - result.changed == true
+      - result.displayName == '{{ folder_name }}'
+- name: Verify that the folder was created
+  raphaeldegail.googlecloudy.gcp_resourcemanager_folder_info:
+    parent: 'organizations/{{ org_id }}'
+    display_name: '{{ folder_name }}'
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+  register: results
+  until: "results['name'] is defined"
+  retries: 10
+  delay: 10
+- name: Verify that command succeeded
+  ansible.builtin.assert:
+    that:
+      - "results['name'] is defined"
+      - results.displayName == '{{ folder_name }}'
+#-----------------------------------------------------------------------------
+- name: Create an already existing folder
+  raphaeldegail.googlecloudy.gcp_resourcemanager_folder:
+    parent: 'organizations/{{ org_id }}'
+    display_name: '{{ folder_name }}'
+    state: present
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+  register: result
+- name: Assert changed is false
+  ansible.builtin.assert:
+    that:
+      - result.changed == false
+      - result.displayName == '{{ folder_name }}'
+# ----------------------------------------------------------------------------
+- name: Delete the folder
+  raphaeldegail.googlecloudy.gcp_resourcemanager_folder:
+    parent: 'organizations/{{ org_id }}'
+    display_name: '{{ folder_name }}'
+    state: absent
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+  register: result
+- name: Assert changed is true
+  ansible.builtin.assert:
+    that:
+      - result.changed == true
+# ----------------------------------------------------------------------------
+- name: Check the folder is deleted
+  raphaeldegail.googlecloudy.gcp_resourcemanager_folder_info:
+    parent: 'organizations/{{ org_id }}'
+    display_name: '{{ folder_name }}'
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+  register: results
+  until: results.state == 'DELETE_REQUESTED'
+  retries: 10
+  delay: 10
+- name: Verify that deletion succeeded
+  ansible.builtin.assert:
+    that:
+      - results.state == 'DELETE_REQUESTED'
+# ----------------------------------------------------------------------------
+- name: Delete a deleted folder
+  raphaeldegail.googlecloudy.gcp_resourcemanager_folder:
+    parent: 'organizations/{{ org_id }}'
+    display_name: '{{ folder_name }}'
+    state: absent
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+  register: result
+- name: Assert changed is false
+  ansible.builtin.assert:
+    that:
+      - result.changed == false
+      - result.state == 'DELETE_REQUESTED'

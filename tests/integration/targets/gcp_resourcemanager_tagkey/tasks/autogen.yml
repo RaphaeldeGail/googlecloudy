@@ -1,0 +1,116 @@
+# Pre-test setup
+- name: Delete a tag key
+  raphaeldegail.googlecloudy.gcp_resourcemanager_tagkey:
+    short_name: for-tests
+    parent: 'organizations/{{ org_id }}'
+    state: absent
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+#----------------------------------------------------------
+- name: Create a tag key
+  raphaeldegail.googlecloudy.gcp_resourcemanager_tagkey:
+    short_name: for-tests
+    parent: 'organizations/{{ org_id }}'
+    state: present
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+  register: result
+- name: Assert changed is true
+  ansible.builtin.assert:
+    that:
+      - result.changed == true
+      - result.shortName == 'for-tests'
+- name: Verify that the creattion was successful
+  raphaeldegail.googlecloudy.gcp_resourcemanager_tagkey_info:
+    short_name: for-tests
+    parent: 'organizations/{{ org_id }}'
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+  register: results
+- name: Verify that command succeeded
+  ansible.builtin.assert:
+    that:
+      - "results['name'] is defined"
+      - results.shortName == 'for-tests'
+#-----------------------------------------------------------------------------
+- name: Create an already existing tag key
+  raphaeldegail.googlecloudy.gcp_resourcemanager_tagkey:
+    short_name: for-tests
+    parent: 'organizations/{{ org_id }}'
+    state: present
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+  register: result
+- name: Assert changed is false
+  ansible.builtin.assert:
+    that:
+      - result.changed == false
+      - result.shortName == 'for-tests'
+# ----------------------------------------------------------------------------
+- name: Update the tag key
+  raphaeldegail.googlecloudy.gcp_resourcemanager_tagkey:
+    short_name: for-tests
+    parent: 'organizations/{{ org_id }}'
+    description: 'For tests.'
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+  register: result
+- name: Assert changed is true
+  ansible.builtin.assert:
+    that:
+      - result.changed == true
+      - result.description == 'For tests.'
+# ----------------------------------------------------------------------------
+- name: Check tag key was updated
+  raphaeldegail.googlecloudy.gcp_resourcemanager_tagkey_info:
+    short_name: for-tests
+    parent: 'organizations/{{ org_id }}'
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+  register: results
+- name: Verify that update succeeded
+  ansible.builtin.assert:
+    that:
+      - "results['name'] is defined"
+      - results.shortName == 'for-tests'
+      - results.description == 'For tests.'
+# ----------------------------------------------------------------------------
+- name: Delete the tag key
+  raphaeldegail.googlecloudy.gcp_resourcemanager_tagkey:
+    short_name: for-tests
+    parent: 'organizations/{{ org_id }}'
+    state: absent
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+  register: result
+- name: Assert changed is true
+  ansible.builtin.assert:
+    that:
+      - result.changed == true
+      - "result.name is undefined"
+# ----------------------------------------------------------------------------
+- name: Check the tag key is absent
+  raphaeldegail.googlecloudy.gcp_resourcemanager_tagkey_info:
+    short_name: for-tests
+    parent: 'organizations/{{ org_id }}'
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+  register: results
+- name: Verify that deletion succeeded
+  ansible.builtin.assert:
+    that:
+      - "results.name is undefined"
+# ----------------------------------------------------------------------------
+- name: Delete an inexistant tag key
+  raphaeldegail.googlecloudy.gcp_resourcemanager_tagkey:
+    short_name: for-tests
+    parent: 'organizations/{{ org_id }}'
+    state: absent
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+  register: result
+- name: Assert changed is false
+  ansible.builtin.assert:
+    that:
+      - result.changed == false
+      - "result.name is undefined"

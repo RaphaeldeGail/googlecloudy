@@ -1,0 +1,118 @@
+# Pre-test setup
+- name: Delete a service account
+  raphaeldegail.googlecloudy.gcp_iam_service_account:
+    name: demo-account
+    state: absent
+    project: '{{ project_id }}'
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+#----------------------------------------------------------
+- name: Create a service account
+  raphaeldegail.googlecloudy.gcp_iam_service_account:
+    name: demo-account
+    state: present
+    project: '{{ project_id }}'
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+  register: result
+- name: Assert changed is true
+  ansible.builtin.assert:
+    that:
+      - result.changed == true
+      - result.email.split('@')[0] == 'demo-account'
+- name: Verify that the creation was succesful
+  raphaeldegail.googlecloudy.gcp_iam_service_account_info:
+    name: demo-account
+    project: '{{ project_id }}'
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+  register: results
+- name: Verify that command succeeded
+  ansible.builtin.assert:
+    that:
+      - "results['name'] is defined"
+      - results.email.split('@')[0] == 'demo-account'
+#-----------------------------------------------------------------------------
+- name: Create an already existing service account
+  raphaeldegail.googlecloudy.gcp_iam_service_account:
+    name: demo-account
+    state: present
+    project: '{{ project_id }}'
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+  register: result
+- name: Assert changed is false
+  ansible.builtin.assert:
+    that:
+      - result.changed == false
+      - result.email.split('@')[0] == 'demo-account'
+# ----------------------------------------------------------------------------
+- name: Update the service account
+  raphaeldegail.googlecloudy.gcp_iam_service_account:
+    name: demo-account
+    display_name: 'Demo Account'
+    state: present
+    project: '{{ project_id }}'
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+  register: result
+- name: Assert changed is true
+  ansible.builtin.assert:
+    that:
+      - result.changed == true
+      - result.email.split('@')[0] == 'demo-account'
+      - result.displayName == 'Demo Account'
+# ----------------------------------------------------------------------------
+- name: Check service account was updated
+  raphaeldegail.googlecloudy.gcp_iam_service_account_info:
+    name: demo-account
+    project: '{{ project_id }}'
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+  register: results
+- name: Verify that update succeeded
+  ansible.builtin.assert:
+    that:
+      - "results['name'] is defined"
+      - results.email.split('@')[0] == 'demo-account'
+      - results['displayName'] == 'Demo Account'
+# ----------------------------------------------------------------------------
+- name: Delete the service account
+  raphaeldegail.googlecloudy.gcp_iam_service_account:
+    name: demo-account
+    state: absent
+    project: '{{ project_id }}'
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+  register: result
+- name: Assert changed is true
+  ansible.builtin.assert:
+    that:
+      - result.changed == true
+      - "result.name is undefined"
+# ----------------------------------------------------------------------------
+- name: Check the service account is absent
+  raphaeldegail.googlecloudy.gcp_iam_service_account_info:
+    name: demo-account
+    project: '{{ project_id }}'
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+  register: results
+- name: Verify that deletion succeeded
+  ansible.builtin.assert:
+    that:
+      - "results.name is undefined"
+# ----------------------------------------------------------------------------
+- name: Delete an inexistant service account
+  raphaeldegail.googlecloudy.gcp_iam_service_account:
+    name: demo-account
+    state: absent
+    project: '{{ project_id }}'
+    auth_kind: "{{ gcp_cred_kind }}"
+    service_account_file: "{{ gcp_cred_file | default(omit) }}"
+  register: result
+- name: Assert changed is false
+  ansible.builtin.assert:
+    that:
+      - result.changed == false
+      - "result.name is undefined"

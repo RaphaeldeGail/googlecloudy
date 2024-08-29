@@ -1,0 +1,36 @@
+---
+requires_ansible: ">=2.16.0"
+
+action_groups:
+  gcp:
+    - gcp_billing_account_iam
+    - gcp_billing_account_iam_info
+    - gcp_billing_association
+    - gcp_billing_association_info
+    - gcp_cloudidentity_group
+    - gcp_cloudidentity_group_info
+    - gcp_cloudidentity_group_membership
+    - gcp_cloudidentity_group_membership_info
+    - gcp_iam_organization_role
+    - gcp_iam_organization_role_info
+    - gcp_iam_service_account
+    - gcp_iam_service_account_iam
+    - gcp_iam_service_account_iam_info
+    - gcp_iam_service_account_info
+    - gcp_iam_workload_identity_pool
+    - gcp_iam_workload_identity_pool_info
+    - gcp_iam_workload_identity_provider
+    - gcp_iam_workload_identity_provider_info
+    - gcp_resourcemanager_folder
+    - gcp_resourcemanager_folder_iam
+    - gcp_resourcemanager_folder_iam_info
+    - gcp_resourcemanager_folder_info
+    - gcp_resourcemanager_organization_iam
+    - gcp_resourcemanager_organization_iam_info
+    - gcp_resourcemanager_organization_info
+    - gcp_resourcemanager_project_iam
+    - gcp_resourcemanager_project_iam_info
+    - gcp_resourcemanager_tagkey
+    - gcp_resourcemanager_tagkey_iam
+    - gcp_resourcemanager_tagkey_iam_info
+    - gcp_resourcemanager_tagkey_info

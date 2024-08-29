@@ -1,0 +1,45 @@
+---
+name: Run tests for the raphaeldegail.googlecloudy collection
+on:
+  pull_request: {}
+env:
+  PYTHON_VERSION: '3.11'
+jobs:
+  sanity-and-lint:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ansible_collections/raphaeldegail/googlecloudy
+    steps:
+      - name: check out code
+        uses: actions/checkout@v4
+        with:
+          path: ansible_collections/raphaeldegail/googlecloudy
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Install ansible and tests
+        run: pip install -r requirements-test.txt
+      - name: Run ansible-test sanity
+        run: ansible-test sanity -v --color --python ${{ env.PYTHON_VERSION }}
+  unit:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ansible_collections/raphaeldegail/googlecloudy
+    steps:
+      - name: check out code
+        uses: actions/checkout@v4
+        with:
+          path: ansible_collections/raphaeldegail/googlecloudy
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Install test dependencies
+        run: pip install -r requirements-test.txt
+      - name: Run unit tests
+        run: ansible-test units -v --color --python ${{ env.PYTHON_VERSION }}
