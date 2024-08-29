@@ -52,4 +52,4 @@ jobs:
         # Add the -vvv flag to print out more output
         env:
           GCP_ACCESS_TOKEN: ${{ steps.auth.outputs.access_token }}
-        run:  ansible-test integration -v --color --python ${{ env.PYTHON_VERSION }} gcp_billing_account_iam
+        run:  export GCP_ACCESS_TOKEN="${{ steps.auth.outputs.access_token }}"; ansible-test integration -v --color --python ${{ env.PYTHON_VERSION }} gcp_billing_account_iam
