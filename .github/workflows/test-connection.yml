@@ -39,7 +39,7 @@ jobs:
           gcp_billing_account_id: $CI_GCP_BILLING_ACCOUNT
           demo_user: $CI_DEMO_USER
           demo_account: $CI_DEMO_ACCOUNT
-          gcp_cred_kind: accesstoken
+          gcp_cred_kind: application
           " > tests/integration/integration_config.yml
       - id: auth
         name: Authenticate to Google Cloud
@@ -50,6 +50,4 @@ jobs:
       # run tests
       - name: Run integration tests
         # Add the -vvv flag to print out more output
-        env:
-          GCP_ACCESS_TOKEN: ${{ steps.auth.outputs.access_token }}
-        run:  export GCP_ACCESS_TOKEN="${{ steps.auth.outputs.access_token }}"; ansible-test integration -v --color --python ${{ env.PYTHON_VERSION }} gcp_billing_account_iam
+        run: ansible-test integration -v --color --python ${{ env.PYTHON_VERSION }} gcp_billing_account_iam
