@@ -57,4 +57,4 @@ jobs:
       - name: Run integration tests
         env:
           ANSIBLE_COLLECTIONS_PATH: "/home/runner/.ansible/collections:${{ github.workspace }}"
-        run: ansible-test integration -v --color --python ${{ env.PYTHON_VERSION }} --start-at gcp_billing_association
+        run: ansible-test integration -vvvv --color --python ${{ env.PYTHON_VERSION }} --start-at gcp_billing_association
