@@ -30,7 +30,7 @@ jobs:
       - name: Install ansible and tests
         run: pip install -r requirements-test.txt
       - name: Install ansible collections
-        run: ansible-galaxy collection install google.cloud:1.3.0; ansible-galaxy collection install community.general:9.2.0; ansible-galaxy collection list
+        run: ansible-galaxy collection install google.cloud:1.3.0 -p $GITHUB_WORKSPACE/ansible_collections; ansible-galaxy collection install community.general:9.2.0 -p $GITHUB_WORKSPACE/ansible_collections; ansible-galaxy collection list
       - id: auth
         name: Authenticate to Google Cloud
         uses: 'google-github-actions/auth@v2'
