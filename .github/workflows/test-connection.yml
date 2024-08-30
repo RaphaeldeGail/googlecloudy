@@ -30,7 +30,7 @@ jobs:
       - name: Install ansible and tests
         run: pip install -r requirements-test.txt
       - name: Install ansible collections
-        run: ansible-galaxy collection install google.cloud:1.3.0; ansible-galaxy collection install community.general:9.2.0; ansible-galaxy collection list
+        run: ansible-galaxy collection install google.cloud:1.3.0 -p ${{ github.workspace }}; ansible-galaxy collection install community.general:9.2.0 -p ${{ github.workspace }}; ansible-galaxy collection list -p ${{ github.workspace }}
       - id: auth
         name: Authenticate to Google Cloud
         uses: 'google-github-actions/auth@v2'
@@ -53,11 +53,6 @@ jobs:
           gcp_cred_kind: accesstoken
           access_token: ${{ steps.auth.outputs.access_token }}
           " > tests/integration/integration_config.yml
-      - name: Write ansible.cfg
-        run: |
-          echo "[defaults]
-          collections_path=/home/runner/.ansible/collections:${{ github.workspace }}
-          " > ansible.cfg
       # run tests
       - name: Run integration tests
         run: ansible-test integration -vvvv --color --python ${{ env.PYTHON_VERSION }} --start-at gcp_billing_association
