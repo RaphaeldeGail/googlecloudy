@@ -51,7 +51,4 @@ jobs:
           " > tests/integration/integration_config.yml
       # run tests
       - name: Run integration tests
-        # env:
-        #   GCP_ACCESS_TOKEN: ${{ steps.auth.outputs.access_token }}
-        # Add the -vvv flag to print out more output
-        run: cat tests/integration/integration_config.yml; ansible-test integration -v --color --python ${{ env.PYTHON_VERSION }} gcp_billing_account_iam
+        run: ansible-test integration -v --color --python ${{ env.PYTHON_VERSION }} gcp_billing_account_iam
