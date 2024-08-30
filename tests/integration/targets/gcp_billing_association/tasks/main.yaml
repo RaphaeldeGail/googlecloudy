@@ -14,7 +14,7 @@
   register: test_project
 - name: Set the project_id
   ansible.builtin.set_fact:
-    project_id: '{{ test_project.id }}'
+    project_id: '{{ test_project.projectId }}'
 - name: Generated tests
   ansible.builtin.include_tasks: autogen.yml
   args:

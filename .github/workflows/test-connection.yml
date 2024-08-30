@@ -55,4 +55,4 @@ jobs:
           " > tests/integration/integration_config.yml
       # run tests
       - name: Run integration tests
-        run: ansible-test integration -vvvv --color --python ${{ env.PYTHON_VERSION }} --start-at gcp_billing_association
+        run: ansible-test integration -v --color --python ${{ env.PYTHON_VERSION }} --start-at gcp_billing_association
