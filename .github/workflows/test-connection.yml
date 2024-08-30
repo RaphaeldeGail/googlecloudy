@@ -53,8 +53,11 @@ jobs:
           gcp_cred_kind: accesstoken
           access_token: ${{ steps.auth.outputs.access_token }}
           " > tests/integration/integration_config.yml
+      - name: Write ansible.cfg
+        run: |
+          echo "[defaults]
+          collections_path=/home/runner/.ansible/collections:${{ github.workspace }}
+          " > ansible.cfg
       # run tests
       - name: Run integration tests
-        env:
-          ANSIBLE_COLLECTIONS_PATH: "/home/runner/.ansible/collections"
         run: ansible-test integration -vvvv --color --python ${{ env.PYTHON_VERSION }} --start-at gcp_billing_association
