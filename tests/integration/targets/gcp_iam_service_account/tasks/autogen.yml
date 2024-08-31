@@ -1,17 +1,7 @@
-- name: Debug check
-  raphaeldegail.googlecloudy.gcp_iam_service_account_info:
-    name: demo-account
-    project_id: '{{ project_id }}'
-    auth_kind: "{{ gcp_cred_kind }}"
-    service_account_file: "{{ gcp_cred_file | default(omit) }}"
-  register: results
-- name: DEBUG
-  ansible.builtin.debug:
-    var: results
 # Pre-test setup
 - name: Delete a service account
   raphaeldegail.googlecloudy.gcp_iam_service_account:
-    name: demo-account
+    name: '{{ account_name }}'
     state: absent
     project_id: '{{ project_id }}'
     auth_kind: "{{ gcp_cred_kind }}"
@@ -19,7 +9,7 @@
 #----------------------------------------------------------
 - name: Create a service account
   raphaeldegail.googlecloudy.gcp_iam_service_account:
-    name: demo-account
+    name: '{{ account_name }}'
     state: present
     project_id: '{{ project_id }}'
     auth_kind: "{{ gcp_cred_kind }}"
@@ -29,10 +19,10 @@
   ansible.builtin.assert:
     that:
       - result.changed == true
-      - result.email.split('@')[0] == 'demo-account'
+      - result.email.split('@')[0] == '{{ account_name }}'
 - name: Verify that the creation was succesful
   raphaeldegail.googlecloudy.gcp_iam_service_account_info:
-    name: demo-account
+    name: '{{ account_name }}'
     project_id: '{{ project_id }}'
     auth_kind: "{{ gcp_cred_kind }}"
     service_account_file: "{{ gcp_cred_file | default(omit) }}"
@@ -41,11 +31,11 @@
   ansible.builtin.assert:
     that:
       - "results['name'] is defined"
-      - results.email.split('@')[0] == 'demo-account'
+      - results.email.split('@')[0] == '{{ account_name }}'
 #-----------------------------------------------------------------------------
 - name: Create an already existing service account
   raphaeldegail.googlecloudy.gcp_iam_service_account:
-    name: demo-account
+    name: '{{ account_name }}'
     state: present
     project_id: '{{ project_id }}'
     auth_kind: "{{ gcp_cred_kind }}"
@@ -55,11 +45,11 @@
   ansible.builtin.assert:
     that:
       - result.changed == false
-      - result.email.split('@')[0] == 'demo-account'
+      - result.email.split('@')[0] == '{{ account_name }}'
 # ----------------------------------------------------------------------------
 - name: Update the service account
   raphaeldegail.googlecloudy.gcp_iam_service_account:
-    name: demo-account
+    name: '{{ account_name }}'
     display_name: 'Demo Account'
     state: present
     project_id: '{{ project_id }}'
@@ -70,12 +60,12 @@
   ansible.builtin.assert:
     that:
       - result.changed == true
-      - result.email.split('@')[0] == 'demo-account'
+      - result.email.split('@')[0] == '{{ account_name }}'
       - result.displayName == 'Demo Account'
 # ----------------------------------------------------------------------------
 - name: Check service account was updated
   raphaeldegail.googlecloudy.gcp_iam_service_account_info:
-    name: demo-account
+    name: '{{ account_name }}'
     project_id: '{{ project_id }}'
     auth_kind: "{{ gcp_cred_kind }}"
     service_account_file: "{{ gcp_cred_file | default(omit) }}"
@@ -84,12 +74,12 @@
   ansible.builtin.assert:
     that:
       - "results['name'] is defined"
-      - results.email.split('@')[0] == 'demo-account'
+      - results.email.split('@')[0] == '{{ account_name }}'
       - results['displayName'] == 'Demo Account'
 # ----------------------------------------------------------------------------
 - name: Delete the service account
   raphaeldegail.googlecloudy.gcp_iam_service_account:
-    name: demo-account
+    name: '{{ account_name }}'
     state: absent
     project_id: '{{ project_id }}'
     auth_kind: "{{ gcp_cred_kind }}"
@@ -103,7 +93,7 @@
 # ----------------------------------------------------------------------------
 - name: Check the service account is absent
   raphaeldegail.googlecloudy.gcp_iam_service_account_info:
-    name: demo-account
+    name: '{{ account_name }}'
     project_id: '{{ project_id }}'
     auth_kind: "{{ gcp_cred_kind }}"
     service_account_file: "{{ gcp_cred_file | default(omit) }}"
@@ -115,7 +105,7 @@
 # ----------------------------------------------------------------------------
 - name: Delete an inexistant service account
   raphaeldegail.googlecloudy.gcp_iam_service_account:
-    name: demo-account
+    name: '{{ account_name }}'
     state: absent
     project_id: '{{ project_id }}'
     auth_kind: "{{ gcp_cred_kind }}"
