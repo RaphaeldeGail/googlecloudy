@@ -1,4 +1,7 @@
 ---
+- name: DEBUG
+  ansible.builtin.debug:
+    var: project_id
 - name: Generated tests
   ansible.builtin.include_tasks: autogen.yml
   args:
