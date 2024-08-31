@@ -46,6 +46,7 @@
     that:
       - result.changed == false
       - result.email.split('@')[0] == '{{ account_name }}'
+      - "results['displayName'] is undefined"
 # ----------------------------------------------------------------------------
 - name: Update the service account
   raphaeldegail.googlecloudy.gcp_iam_service_account:
@@ -56,11 +57,15 @@
     auth_kind: "{{ gcp_cred_kind }}"
     service_account_file: "{{ gcp_cred_file | default(omit) }}"
   register: result
+- name: DEBUG
+  ansible.builtin.debug:
+    var: result
 - name: Assert changed is true
   ansible.builtin.assert:
     that:
       - result.changed == true
       - result.email.split('@')[0] == '{{ account_name }}'
+      - "result['displayName'] is defined"
       - result.displayName == 'Demo Account'
 # ----------------------------------------------------------------------------
 - name: Check service account was updated
