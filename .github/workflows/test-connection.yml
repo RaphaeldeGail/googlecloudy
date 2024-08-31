@@ -63,4 +63,4 @@ jobs:
           " > tests/integration/integration_config.yml
       # run tests
       - name: Run integration tests
-        run: ansible-test integration -v --color --python ${{ env.PYTHON_VERSION }} --start-at gcp_iam_service_account
+        run: ansible-test integration -v --color --python ${{ env.PYTHON_VERSION }} --start-at gcp_iam_service_account_iam
