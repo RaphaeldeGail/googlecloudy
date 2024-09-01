@@ -63,4 +63,4 @@ jobs:
           " > tests/integration/integration_config.yml
       # run tests
       - name: Run integration tests
-        run: ansible-test integration -v --color --python ${{ env.PYTHON_VERSION }} --start-at gcp_iam_workload_identity_provider
+        run: ansible-test integration -v --color --python ${{ env.PYTHON_VERSION }} --start-at gcp_resourcemanager_tagkey
