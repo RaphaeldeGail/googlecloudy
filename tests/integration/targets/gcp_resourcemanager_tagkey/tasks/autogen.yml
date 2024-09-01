@@ -2,7 +2,7 @@
 - name: Delete a tag key
   raphaeldegail.googlecloudy.gcp_resourcemanager_tagkey:
     short_name: for-tests
-    parent: 'organizations/{{ org_id }}'
+    parent: 'projects/{{ project_id }}'
     state: absent
     auth_kind: "{{ gcp_cred_kind }}"
     service_account_file: "{{ gcp_cred_file | default(omit) }}"
@@ -10,7 +10,7 @@
 - name: Create a tag key
   raphaeldegail.googlecloudy.gcp_resourcemanager_tagkey:
     short_name: for-tests
-    parent: 'organizations/{{ org_id }}'
+    parent: 'projects/{{ project_id }}'
     state: present
     auth_kind: "{{ gcp_cred_kind }}"
     service_account_file: "{{ gcp_cred_file | default(omit) }}"
@@ -23,7 +23,7 @@
 - name: Verify that the creattion was successful
   raphaeldegail.googlecloudy.gcp_resourcemanager_tagkey_info:
     short_name: for-tests
-    parent: 'organizations/{{ org_id }}'
+    parent: 'projects/{{ project_id }}'
     auth_kind: "{{ gcp_cred_kind }}"
     service_account_file: "{{ gcp_cred_file | default(omit) }}"
   register: results
@@ -36,7 +36,7 @@
 - name: Create an already existing tag key
   raphaeldegail.googlecloudy.gcp_resourcemanager_tagkey:
     short_name: for-tests
-    parent: 'organizations/{{ org_id }}'
+    parent: 'projects/{{ project_id }}'
     state: present
     auth_kind: "{{ gcp_cred_kind }}"
     service_account_file: "{{ gcp_cred_file | default(omit) }}"
@@ -50,7 +50,7 @@
 - name: Update the tag key
   raphaeldegail.googlecloudy.gcp_resourcemanager_tagkey:
     short_name: for-tests
-    parent: 'organizations/{{ org_id }}'
+    parent: 'projects/{{ project_id }}'
     description: 'For tests.'
     auth_kind: "{{ gcp_cred_kind }}"
     service_account_file: "{{ gcp_cred_file | default(omit) }}"
@@ -64,7 +64,7 @@
 - name: Check tag key was updated
   raphaeldegail.googlecloudy.gcp_resourcemanager_tagkey_info:
     short_name: for-tests
-    parent: 'organizations/{{ org_id }}'
+    parent: 'projects/{{ project_id }}'
     auth_kind: "{{ gcp_cred_kind }}"
     service_account_file: "{{ gcp_cred_file | default(omit) }}"
   register: results
@@ -78,7 +78,7 @@
 - name: Delete the tag key
   raphaeldegail.googlecloudy.gcp_resourcemanager_tagkey:
     short_name: for-tests
-    parent: 'organizations/{{ org_id }}'
+    parent: 'projects/{{ project_id }}'
     state: absent
     auth_kind: "{{ gcp_cred_kind }}"
     service_account_file: "{{ gcp_cred_file | default(omit) }}"
@@ -92,7 +92,7 @@
 - name: Check the tag key is absent
   raphaeldegail.googlecloudy.gcp_resourcemanager_tagkey_info:
     short_name: for-tests
-    parent: 'organizations/{{ org_id }}'
+    parent: 'projects/{{ project_id }}'
     auth_kind: "{{ gcp_cred_kind }}"
     service_account_file: "{{ gcp_cred_file | default(omit) }}"
   register: results
@@ -104,7 +104,7 @@
 - name: Delete an inexistant tag key
   raphaeldegail.googlecloudy.gcp_resourcemanager_tagkey:
     short_name: for-tests
-    parent: 'organizations/{{ org_id }}'
+    parent: 'projects/{{ project_id }}'
     state: absent
     auth_kind: "{{ gcp_cred_kind }}"
     service_account_file: "{{ gcp_cred_file | default(omit) }}"

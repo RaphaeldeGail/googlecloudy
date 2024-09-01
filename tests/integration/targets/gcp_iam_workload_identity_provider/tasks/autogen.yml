@@ -6,7 +6,7 @@
       issuer_uri: 'https://some-url.demo'
     attribute_mapping:
       google.subject: assertion.sub
-    pool_id: '{{ pool_id }}'
+    pool_name: '{{ pool_name }}'
     state: absent
     auth_kind: "{{ gcp_cred_kind }}"
     service_account_file: "{{ gcp_cred_file | default(omit) }}"
@@ -18,7 +18,7 @@
       issuer_uri: 'https://some-url.demo'
     attribute_mapping:
       google.subject: assertion.sub
-    pool_id: '{{ pool_id }}'
+    pool_name: '{{ pool_name }}'
     state: present
     auth_kind: "{{ gcp_cred_kind }}"
     service_account_file: "{{ gcp_cred_file | default(omit) }}"
@@ -31,7 +31,7 @@
 - name: Verify that the provider was created
   raphaeldegail.googlecloudy.gcp_iam_workload_identity_provider_info:
     name: '{{ provider_name }}'
-    pool_id: '{{ pool_id }}'
+    pool_name: '{{ pool_name }}'
     auth_kind: "{{ gcp_cred_kind }}"
     service_account_file: "{{ gcp_cred_file | default(omit) }}"
   register: results
@@ -48,7 +48,7 @@
       issuer_uri: 'https://some-url.demo'
     attribute_mapping:
       google.subject: assertion.sub
-    pool_id: '{{ pool_id }}'
+    pool_name: '{{ pool_name }}'
     state: present
     auth_kind: "{{ gcp_cred_kind }}"
     service_account_file: "{{ gcp_cred_file | default(omit) }}"
@@ -67,7 +67,7 @@
       issuer_uri: 'https://some-url.demomo'
     attribute_mapping:
       google.subject: assertion.sub
-    pool_id: '{{ pool_id }}'
+    pool_name: '{{ pool_name }}'
     state: present
     auth_kind: "{{ gcp_cred_kind }}"
     service_account_file: "{{ gcp_cred_file | default(omit) }}"
@@ -81,7 +81,7 @@
 - name: Check provider was updated
   raphaeldegail.googlecloudy.gcp_iam_workload_identity_provider_info:
     name: '{{ provider_name }}'
-    pool_id: '{{ pool_id }}'
+    pool_name: '{{ pool_name }}'
     auth_kind: "{{ gcp_cred_kind }}"
     service_account_file: "{{ gcp_cred_file | default(omit) }}"
   register: results
@@ -99,7 +99,7 @@
       issuer_uri: 'https://some-url.demo'
     attribute_mapping:
       google.subject: assertion.sub
-    pool_id: '{{ pool_id }}'
+    pool_name: '{{ pool_name }}'
     state: absent
     auth_kind: "{{ gcp_cred_kind }}"
     service_account_file: "{{ gcp_cred_file | default(omit) }}"
@@ -112,7 +112,7 @@
 - name: Check the provider is absent
   raphaeldegail.googlecloudy.gcp_iam_workload_identity_provider_info:
     name: '{{ provider_name }}'
-    pool_id: '{{ pool_id }}'
+    pool_name: '{{ pool_name }}'
     auth_kind: "{{ gcp_cred_kind }}"
     service_account_file: "{{ gcp_cred_file | default(omit) }}"
   register: results
@@ -128,7 +128,7 @@
       issuer_uri: 'https://some-url.demo'
     attribute_mapping:
       google.subject: assertion.sub
-    pool_id: '{{ pool_id }}'
+    pool_name: '{{ pool_name }}'
     state: absent
     auth_kind: "{{ gcp_cred_kind }}"
     service_account_file: "{{ gcp_cred_file | default(omit) }}"

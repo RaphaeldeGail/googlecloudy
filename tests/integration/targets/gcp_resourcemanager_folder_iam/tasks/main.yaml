@@ -1,4 +1,19 @@
 ---
+- name: Creates a folder for the tests
+  raphaeldegail.googlecloudy.gcp_resourcemanager_folder:
+    parent: 'folders/{{ folder_id }}'
+    display_name: 'demo-folder{{ 9999 | random }}'
+    state: present
+    auth_kind: '{{ gcp_cred_kind }}'
+    service_account_file: '{{ gcp_cred_file | default(omit) }}'
+    service_account_contents: '{{ service_account_contents | default(omit) }}'
+    service_account_email: '{{ service_account_email | default(omit) }}'
+    access_token: '{{ access_token | default(omit) }}'
+  register: result
+- name: Set the name
+  ansible.builtin.set_fact:
+    tmp_folder_id: '{{ (result.name | split("/"))[-1] }}'
+    tmp_folder_name: '{{ result.displayName }}'
 - name: Generated tests
   ansible.builtin.include_tasks: autogen.yml
   args:
@@ -10,3 +25,13 @@
           service_account_contents: '{{ service_account_contents | default(omit) }}'
           service_account_email: '{{ service_account_email | default(omit) }}'
           access_token: '{{ access_token | default(omit) }}'
+- name: Deletes the folder after the tests
+  raphaeldegail.googlecloudy.gcp_resourcemanager_folder:
+    parent: 'folders/{{ folder_id }}'
+    display_name: '{{ tmp_folder_name }}'
+    state: absent
+    auth_kind: '{{ gcp_cred_kind }}'
+    service_account_file: '{{ gcp_cred_file | default(omit) }}'
+    service_account_contents: '{{ service_account_contents | default(omit) }}'
+    service_account_email: '{{ service_account_email | default(omit) }}'
+    access_token: '{{ access_token | default(omit) }}'
