@@ -1,7 +1,9 @@
 ---
-name: test.connection
+name: Run integration tests for the raphaeldegail.googlecloudy collection
 on:
+  pull_request: {}
   push:
+    branches: main
 env:
   PYTHON_VERSION: '3.11'
 jobs:
