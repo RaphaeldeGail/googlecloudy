@@ -1,7 +1,7 @@
 ---
 - name: Generate a random role name
   ansible.builtin.set_fact:
-    iam_role_name: 'demo-role{{ 9999 | random }}'
+    iam_role_name: 'demo.role{{ 9999 | random }}'
 - name: Generated tests
   ansible.builtin.include_tasks: autogen.yml
   args:
