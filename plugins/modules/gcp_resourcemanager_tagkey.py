@@ -206,7 +206,12 @@ def main():
 
     if fetch:
         module.params['name'] = fetch.get('name')
-        difference = list_differences(resource_to_request(module), response_to_hash(fetch))
+        before = response_to_hash(fetch)
+        after = resource_to_request(module)
+        # parent is an immutable field
+        del before['parent']
+        del after['parent']
+        difference = list_differences(after, before)
         if state == 'present':
             if difference:
                 update(module, self_link(module))

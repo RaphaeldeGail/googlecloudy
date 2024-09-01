@@ -1,70 +1,68 @@
 ---
-name: Run integration tests for the cloud.google collection
+name: Run integration tests for the raphaeldegail.googlecloudy collection
 on:
   pull_request: {}
   push:
-    branches: master
+    branches: main
 env:
-  GCP_SERVICE_ACCOUNT: github-ci@ansible-gcp-ci.iam.gserviceaccount.com
-  GCP_PROJECT: ansible-gcp-ci
-  GCP_FOLDER_ID: "542027184392"
+  PYTHON_VERSION: '3.11'
 jobs:
-  integration:
-    # NOTE: GitHub does not allow secrets to be used
-    # in PRs sent from forks. As such, this configuration is for
-    # PRs that the maintainers would like to send to test.
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+  gcp:
     runs-on: ubuntu-latest
+    # Environment where integration variables are stored
+    environment: develop
+    # Add "id-token" with the intended permissions.
+    permissions:
+      contents: 'read'
+      id-token: 'write'
     defaults:
       run:
-        working-directory: ansible_collections/google/cloud
-    strategy:
-      max-parallel: 1
-      matrix:
-        ansible_version:
-          - stable-2.14
-          - stable-2.15
+        working-directory: ansible_collections/raphaeldegail/googlecloudy
     steps:
       - name: check out code
         uses: actions/checkout@v4
         with:
-          path: ansible_collections/google/cloud
+          path: ansible_collections/raphaeldegail/googlecloudy
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.9'  # this is the minimum version required for Ansible 2.15
+          python-version: ${{ env.PYTHON_VERSION }}
       - name: Install dependencies
         run: pip install -r requirements.txt
-      - name: Install ansible-base (${{ matrix.ansible_version }})
-        run: pip install https://github.com/ansible/ansible/archive/${{ matrix.ansible_version }}.tar.gz --disable-pip-version-check
-      # bootstrap integration env
+      - name: Install ansible and tests
+        run: pip install -r requirements-test.txt
+      - name: Install ansible collections
+        run: ansible-galaxy collection install -r requirements-test.yml -p ${{ github.workspace }}
+      - id: auth
+        name: Authenticate to Google Cloud
+        uses: 'google-github-actions/auth@v2'
+        with:
+          token_format: 'access_token'
+          workload_identity_provider: ${{ secrets.CI_WORKLOAD_PROVIDER }}
+          service_account: ${{ secrets.CI_SERVICE_ACCOUNT }}
       - name: Write integration-test configuration files
         env:
-          CI_SERVICE_ACCOUNT_FILE_CONTENTS: ${{ secrets.CI_SERVICE_ACCOUNT_FILE_CONTENTS }}
+          CI_GCP_BILLING_ACCOUNT: ${{ secrets.CI_GCP_BILLING_ACCOUNT }}
+          CI_DEMO_USER: ${{ secrets.CI_DEMO_USER }}
+          CI_DEMO_ACCOUNT: ${{ secrets.CI_DEMO_ACCOUNT }}
+          CI_DEMO_GROUP: ${{ secrets.CI_DEMO_GROUP }}
+          CI_ORG_ID: ${{ secrets.CI_ORG_ID }}
+          CI_CUSTOMER_DIRECTORY: ${{ secrets.CI_CUSTOMER_DIRECTORY }}
+          CI_PROJECT_ID: ${{ secrets.CI_PROJECT_ID }}
+          CI_FOLDER_ID: ${{ secrets.CI_FOLDER_ID }}
         run: |
-          echo "$CI_SERVICE_ACCOUNT_FILE_CONTENTS" > /tmp/service-account-key.json
-          echo "[default]
-          gcp_project: $GCP_PROJECT
-          gcp_cred_file: /tmp/service-account-key.json
-          gcp_cred_kind: serviceaccount
-          gcp_cred_email: $GCP_SERVICE_ACCOUNT
-          gcp_folder_id: $GCP_FOLDER_ID
-          " > ./tests/integration/cloud-config-gcp.ini
-      # cleanup test environment
-      - name: Auth to Gcloud
-        uses: google-github-actions/auth@v1
-        env:
-          CI_SERVICE_ACCOUNT_FILE_CONTENTS: ${{ secrets.CI_SERVICE_ACCOUNT_FILE_CONTENTS }}
-        with:
-          service_account: $GCP_SERVICE_ACCOUNT
-          credentials_json: ${{ secrets.CI_SERVICE_ACCOUNT_FILE_CONTENTS }}
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v1
-      - name: Run cleanup
-        run: |
-          ./scripts/bootstrap-project.sh $GCP_PROJECT $GCP_SERVICE_ACCOUNT
-          ./scripts/cleanup-project.sh $GCP_PROJECT $GCP_FOLDER_ID
+          echo "---
+          gcp_billing_account_id: $CI_GCP_BILLING_ACCOUNT
+          demo_user: $CI_DEMO_USER
+          demo_account: $CI_DEMO_ACCOUNT
+          demo_group: $CI_DEMO_GROUP
+          org_id: $CI_ORG_ID
+          customer_directory_id: $CI_CUSTOMER_DIRECTORY
+          folder_id: $CI_FOLDER_ID
+          project_id: $CI_PROJECT_ID
+          gcp_cred_kind: accesstoken
+          access_token: ${{ steps.auth.outputs.access_token }}
+          " > tests/integration/integration_config.yml
       # run tests
       - name: Run integration tests
-        # Add the -vvv flag to print out more output
-        run: ansible-test integration -v --color --python 3.9 --venv-system-site-packages
+        run: ansible-test integration -v --color --python ${{ env.PYTHON_VERSION }}

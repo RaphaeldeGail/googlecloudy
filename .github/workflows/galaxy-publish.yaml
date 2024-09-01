@@ -1,6 +1,5 @@
 ---
 name: Upload release to Galaxy
-
 on:
   release:
     types: [created, published, released]

@@ -185,7 +185,7 @@ def fetch_resource(module, link):
 
 
 def collection():
-    return "{api}/tagKeys"
+    return "{api}/tagKeys".format(api=API)
 
 
 if __name__ == '__main__':

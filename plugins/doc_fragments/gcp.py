@@ -124,8 +124,8 @@ options:
                   A single identity in a workload identity pool."
                 - "- principalSet://iam.googleapis.com/projects/{projectNumber}/locations/global/workloadIdentityPools/{pool_id}/group/{groupId}:
                   A workload identity pool group."
-                - "- principalSet://iam.googleapis.com/projects/{projectNumber}/locations/global/workloadIdentityPools/{pool_id}/attribute.{attribute_name}/{attribute_value}:
-                  All identities in a workload identity pool with a certain attribute."
+                - "- principalSet://iam.googleapis.com/projects/{projectNumber}/locations/global/workloadIdentityPools/{pool_id}/attribute.{attribute_name}/\
+                  {attribute_value}: All identities in a workload identity pool with a certain attribute."
                 - "- principalSet://iam.googleapis.com/projects/{projectNumber}/locations/global/workloadIdentityPools/{pool_id}/*:
                   All identities in a workload identity pool."
                 - "- deleted:user:{emailid}?uid={uniqueid}: An email address (plus unique identifier) representing a user that has been recently deleted.
