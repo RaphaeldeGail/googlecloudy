@@ -1,4 +1,7 @@
 # Pre-test setup
+- name: DEBUG
+  ansible.builtin.debug:
+    var: role_name
 - name: Delete a role
   raphaeldegail.googlecloudy.gcp_iam_organization_role:
     name: '{{ role_name }}'

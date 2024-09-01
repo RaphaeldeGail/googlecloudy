@@ -3,11 +3,11 @@ name: Run integration tests for the raphaeldegail.googlecloudy collection
 on:
   pull_request: {}
   push:
-    branches: main
+    branches: [ main, develop ]
 env:
   PYTHON_VERSION: '3.11'
 jobs:
-  gcp:
+  integration:
     runs-on: ubuntu-latest
     # Environment where integration variables are stored
     environment: develop
@@ -65,4 +65,4 @@ jobs:
           " > tests/integration/integration_config.yml
       # run tests
       - name: Run integration tests
-        run: ansible-test integration -v --color --python ${{ env.PYTHON_VERSION }}
+        run: ansible-test integration -v --color --python ${{ env.PYTHON_VERSION }} --start-at gcp_iam_organization_role
