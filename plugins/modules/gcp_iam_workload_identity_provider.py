@@ -267,7 +267,6 @@ def main():
         if state == 'present':
             create(module, collection(module))
             fetch = fetch_resource(module, self_link(module))
-            module.fail_json(msg=fetch)
             changed = True
         else:
             fetch = {}
