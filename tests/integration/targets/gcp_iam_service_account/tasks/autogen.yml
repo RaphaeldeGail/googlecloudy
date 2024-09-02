@@ -122,6 +122,9 @@
     service_account_file: "{{ gcp_cred_file | default(omit) }}"
   check_mode: true
   register: result
+  until: result.action == None
+  retries: 10
+  delay: 10
 - name: Show prediction
   ansible.builtin.debug:
     var: result
