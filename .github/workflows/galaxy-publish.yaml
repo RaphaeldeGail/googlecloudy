@@ -6,7 +6,25 @@ on:
 env:
   PYTHON_VERSION: '3.11'
 jobs:
+  version:
+    runs-on: ubuntu-latest
+    environment: prod
+    outputs:
+      from_file: ${{ steps.yaml-data.outputs.data }}
+    steps:
+    - uses: actions/checkout@v4
+    - name: Run read-yaml action
+      id: yaml-data
+      uses: jbutcher5/read-yaml@1.6
+      with:
+        file: './galaxy.yml'
+        key-path: '["version"]'
+    - name: Error if version mismatch
+      run: echo "::error ::Version mismatch"
+      if: format('v{0}', steps.yaml-data.outputs.data) != github.event.release.tag_name
   deploy:
+    needs: version
+    if: format('v{0}', needs.version.outputs.from_file) == github.event.release.tag_name
     runs-on: ubuntu-latest
     environment: prod
     steps:

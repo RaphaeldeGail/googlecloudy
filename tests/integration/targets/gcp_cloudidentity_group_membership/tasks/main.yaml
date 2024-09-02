@@ -2,7 +2,7 @@
 - name: Create a Google group fot the tests
   raphaeldegail.googlecloudy.gcp_cloudidentity_group:
     group_key:
-      id: '{{ demo_group }}'
+      id: 'demo-group{{ 9999 | random }}@{{ gcp_domain }}'
     parent: 'customers/{{ customer_directory_id }}'
     labels:
       cloudidentity.googleapis.com/groups.discussion_forum: ''
@@ -27,7 +27,7 @@
 - name: Delete the group after the tests
   raphaeldegail.googlecloudy.gcp_cloudidentity_group:
     group_key:
-      id: '{{ demo_group }}'
+      id: '{{ tmp_group.groupKey.id  }}'
     parent: 'customers/{{ customer_directory_id }}'
     labels:
       cloudidentity.googleapis.com/groups.discussion_forum: ''
