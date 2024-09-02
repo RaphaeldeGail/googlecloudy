@@ -139,7 +139,8 @@ def main():
             name=dict(type='str'),
             display_name=dict(type='str'),
             project_id=dict(required=True, type='str')
-        )
+        ),
+        supports_check_mode=True
     )
 
     if not module.params['scopes']:
@@ -155,18 +156,26 @@ def main():
         difference = list_differences(resource_to_request(module), response_to_hash(fetch))
         if state == 'present':
             if difference:
+                if module.check_mode:
+                    module.exit_json(changed=False, before=fetch, action=update, diff=difference)
                 update(module, self_link(module))
                 fetch = fetch_resource(module, self_link(module), False)['result']
                 changed = True
         else:
+            if module.check_mode:
+                module.exit_json(changed=False, before=fetch, action=delete)
             delete(module, self_link(module))
             fetch = {}
             changed = True
     else:
         if state == 'present':
+            if module.check_mode:
+                module.exit_json(changed=False, before=fetch, action=create)
             fetch = create(module, collection(module))
             changed = True
         else:
+            if module.check_mode:
+                module.exit_json(changed=False, before=fetch, action=None)
             fetch = {}
 
     fetch.update({'changed': changed})
