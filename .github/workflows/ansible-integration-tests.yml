@@ -3,7 +3,7 @@ name: Run integration tests for the raphaeldegail.googlecloudy collection
 on:
   pull_request: {}
   push:
-    branches: [ main, develop ]
+    branches: main
 env:
   PYTHON_VERSION: '3.11'
 jobs:
@@ -46,6 +46,7 @@ jobs:
           CI_DEMO_USER: ${{ secrets.CI_DEMO_USER }}
           CI_DEMO_ACCOUNT: ${{ secrets.CI_DEMO_ACCOUNT }}
           CI_ORG_ID: ${{ secrets.CI_ORG_ID }}
+          CI_GCP_DOMAIN: ${{ secrets.CI_GCP_DOMAIN }}
           CI_CUSTOMER_DIRECTORY: ${{ secrets.CI_CUSTOMER_DIRECTORY }}
           CI_PROJECT_ID: ${{ secrets.CI_PROJECT_ID }}
           CI_FOLDER_ID: ${{ secrets.CI_FOLDER_ID }}
@@ -55,6 +56,7 @@ jobs:
           demo_user: $CI_DEMO_USER
           demo_account: $CI_DEMO_ACCOUNT
           org_id: $CI_ORG_ID
+          gcp_domain: $CI_GCP_DOMAIN
           customer_directory_id: $CI_CUSTOMER_DIRECTORY
           folder_id: $CI_FOLDER_ID
           project_id: $CI_PROJECT_ID
