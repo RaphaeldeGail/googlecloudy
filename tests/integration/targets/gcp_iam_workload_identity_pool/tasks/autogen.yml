@@ -64,7 +64,7 @@
       - result.displayName == 'Demo Pool'
       - result.description == 'This is a demo pool'
 # ----------------------------------------------------------------------------
-- name: Check policy was updated
+- name: Check pool was updated
   raphaeldegail.googlecloudy.gcp_iam_workload_identity_pool_info:
     name: '{{ pool_name }}'
     project_id: '{{ project_id }}'
@@ -90,7 +90,7 @@
       - result.changed == true
       - "result.name is undefined"
 # ----------------------------------------------------------------------------
-- name: Check the group is absent
+- name: Check the pool is absent
   raphaeldegail.googlecloudy.gcp_iam_workload_identity_pool_info:
     name: '{{ pool_name }}'
     project_id: '{{ project_id }}'
