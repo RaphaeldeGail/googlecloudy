@@ -26,9 +26,11 @@
     that:
       - result.changed == true
       - result.groupKey.id == '{{ demo_group }}'
-- name: Verify that the binding was succesful
+- name: Verify that the creation was succesful
   raphaeldegail.googlecloudy.gcp_cloudidentity_group_info:
-    name: '{{ result.name }}'
+    group_key:
+      id: '{{ demo_group }}'
+    parent: 'customers/{{ customer_directory_id }}'
     auth_kind: "{{ gcp_cred_kind }}"
     service_account_file: "{{ gcp_cred_file | default(omit) }}"
   register: results

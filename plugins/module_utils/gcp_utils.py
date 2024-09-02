@@ -185,11 +185,19 @@ def return_if_object(module, response, err_path=('error', 'message'), allow_not_
     """
     # If not found, return nothing.
     if allow_not_found and response.status_code == 404:
-        return None
+        return {
+            'result': None,
+            'status_code': response.status_code,
+            'url': response.url
+        }
 
     # If no content, return nothing.
     if response.status_code == 204:
-        return None
+        return {
+            'result': None,
+            'status_code': response.status_code,
+            'url': response.url
+        }
 
     # SQL only: return on 403 if not exist
     # if allow_not_found and response.status_code == 403:
@@ -332,7 +340,7 @@ class GcpSession(object):
         Returns:
             dict, the list response from the API.
         """
-        resp = callback(self.module, self.full_get(url, params, **kwargs))
+        resp = callback(self.module, self.full_get(url, params, **kwargs))['result']
         items = resp.get(array_name) if resp.get(array_name) else []
         while resp.get(pageToken):
             if params:
@@ -340,7 +348,7 @@ class GcpSession(object):
             else:
                 params = {'pageToken': resp[pageToken]}
 
-            resp = callback(self.module, self.full_get(url, params, **kwargs))
+            resp = callback(self.module, self.full_get(url, params, **kwargs))['result']
             if resp.get(array_name):
                 items = items + resp.get(array_name)
         return items
@@ -360,7 +368,7 @@ class GcpSession(object):
         Returns:
             dict, the list response from the API.
         """
-        resp = callback(self.module, self.full_post(url, data, **kwargs))
+        resp = callback(self.module, self.full_post(url, data, **kwargs))['result']
         items = resp.get(array_name) if resp.get(array_name) else []
         while resp.get(pageToken):
             if data:
@@ -368,7 +376,7 @@ class GcpSession(object):
             else:
                 data = {'pageToken': resp[pageToken]}
 
-            resp = callback(self.module, self.full_post(url, data, **kwargs))
+            resp = callback(self.module, self.full_post(url, data, **kwargs))['result']
             if resp.get(array_name):
                 items = items + resp.get(array_name)
         return items

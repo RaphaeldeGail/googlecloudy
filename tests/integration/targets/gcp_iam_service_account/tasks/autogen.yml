@@ -105,12 +105,10 @@
     auth_kind: "{{ gcp_cred_kind }}"
     service_account_file: "{{ gcp_cred_file | default(omit) }}"
   register: results
-  until: "results.name is undefined"
+  # The service account name should be missing and the reponse status code should be 'not found'
+  until: "results.name is undefined and results.status_code == 404"
   retries: 10
   delay: 10
-- name: DEBUG
-  ansible.builtin.debug:
-    var: results
 - name: Verify that deletion succeeded
   ansible.builtin.assert:
     that:

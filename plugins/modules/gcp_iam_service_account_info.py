@@ -127,7 +127,7 @@ def main():
     changed = False
 
     if not fetch:
-        fetch = {'status_code': fetch['status_code'], 'url': fetch['url']}
+        fetch = {'status_code': result['status_code'], 'url': result['url']}
 
     fetch.update({'changed': changed})
 
