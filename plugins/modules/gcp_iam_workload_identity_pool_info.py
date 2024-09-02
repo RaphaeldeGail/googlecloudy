@@ -116,7 +116,7 @@ def main():
     result = fetch_resource(module, self_link(module), True)
     fetch = result['result']
     changed = False
-  
+
     if not fetch:
         fetch = {'status_code': result['status_code'], 'url': result['url']}
 
