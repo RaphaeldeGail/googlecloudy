@@ -125,7 +125,7 @@ def main():
     if not module.params['scopes']:
         module.params['scopes'] = ['https://www.googleapis.com/auth/cloud-billing.readonly']
 
-    fetch = fetch_resource(module, f'{self_link(module)}:getIamPolicy', False)
+    fetch = fetch_resource(module, f'{self_link(module)}:getIamPolicy', False)['result']
     changed = False
 
     fetch.update({'changed': changed})

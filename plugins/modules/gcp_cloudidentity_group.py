@@ -302,7 +302,7 @@ def main():
             difference = list_differences(resource_to_request(module), response_to_hash(fetch))
             if difference:
                 update(module, self_link(module))
-                fetch = fetch_resource(module, self_link(module), False)
+                fetch = fetch_resource(module, self_link(module), False)['result']
                 changed = True
         else:
             delete(module, self_link(module))

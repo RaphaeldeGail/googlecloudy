@@ -113,7 +113,7 @@ def main():
     if not module.params['scopes']:
         module.params['scopes'] = ['https://www.googleapis.com/auth/iam']
 
-    fetch = fetch_resource(module, self_link(module))
+    fetch = fetch_resource(module, self_link(module), True)['result']
     changed = False
 
     fetch.update({'changed': changed})

@@ -190,12 +190,12 @@ def get(module, link):
             }
         ),
         allow_not_found=False
-    )
+    )['result']
 
 
 def set(module, link):
     auth = GcpSession(module, 'resourcemanager')
-    return return_if_object(module, auth.post(f'{link}:setIamPolicy', resource_to_request(module)), allow_not_found=False)
+    return return_if_object(module, auth.post(f'{link}:setIamPolicy', resource_to_request(module)), allow_not_found=False)['result']
 
 
 def resource_to_request(module):

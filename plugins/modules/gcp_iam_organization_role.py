@@ -168,7 +168,7 @@ def main():
 
     state = module.params["state"]
 
-    fetch = fetch_resource(module, self_link(module))
+    fetch = fetch_resource(module, self_link(module), True)['result']
     changed = False
     difference = None
 
@@ -180,7 +180,7 @@ def main():
                 changed = True
             elif difference:
                 update(module, self_link(module), difference)
-                fetch = fetch_resource(module, self_link(module))
+                fetch = fetch_resource(module, self_link(module))['result']
                 changed = True
         elif not fetch.get("deleted"):
             delete(module, self_link(module))
@@ -201,7 +201,7 @@ def main():
 
 def create(module, link):
     auth = GcpSession(module, "iam")
-    return return_if_object(module, auth.post(link, resource_to_create(module)))
+    return return_if_object(module, auth.post(link, resource_to_create(module)))['result']
 
 
 def update(module, link, difference):
@@ -211,19 +211,19 @@ def update(module, link, difference):
     }
     request = resource_to_request(module)
     del request["name"]
-    return return_if_object(module, auth.patch(link, request, params=params))
+    return return_if_object(module, auth.patch(link, request, params=params))['result']
 
 
 def delete(module, link):
     auth = GcpSession(module, "iam")
-    return return_if_object(module, auth.delete(link), allow_not_found=True)
+    return return_if_object(module, auth.delete(link), allow_not_found=True)['result']
 
 
 def undelete(module, link, etag):
     auth = GcpSession(module, "iam")
     return return_if_object(module, auth.post(f'{link}:undelete', {
         "etag": etag
-    }))
+    }))['result']
 
 
 def updateMask(difference):

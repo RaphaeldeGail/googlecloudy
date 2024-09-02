@@ -95,7 +95,7 @@ def wait_for_operation(module, response, api):
     Returns:
         dict, the resource info after the operation has ended.
     """
-    op_result = return_if_object(module, response)
+    op_result = return_if_object(module, response)['result']
     if not op_result:
         return {}
     status = navigate_hash(op_result, ['done'])
@@ -121,7 +121,7 @@ def wait_for_completion(status, op_result, module, api):
     while not status:
         raise_if_errors(op_result, ['error'], module)
         time.sleep(1.0)
-        op_result = fetch_resource(module, op_uri, False)
+        op_result = fetch_resource(module, op_uri, False)['result']
         status = navigate_hash(op_result, ['done'])
     return op_result
 
@@ -156,7 +156,7 @@ def raise_if_errors(response, err_path, module):
         module.fail_json(msg=errors)
 
 
-def fetch_resource(module, link, allow_not_found=True):
+def fetch_resource(module, link, allow_not_found=False):
     """Return the resource info.
 
     Args:
@@ -206,10 +206,13 @@ def return_if_object(module, response, err_path=('error', 'message'), allow_not_
     if navigate_hash(result, err_path):
         module.fail_json(msg=navigate_hash(result, err_path))
 
-    if isinstance(result, type(None)):
-        module.fail_json(msg='Resource response is empty: status code %s at URL %s' % (response.status_code, response.url))
+    full_result = {
+        'result': result,
+        'status_code': response.status_code,
+        'url': response.url
+    }
 
-    return result
+    return full_result
 
 
 def list_differences(request, response):
