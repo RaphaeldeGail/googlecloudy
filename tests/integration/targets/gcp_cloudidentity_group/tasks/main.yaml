@@ -1,4 +1,7 @@
 ---
+- name: Generate a random group name
+  ansible.builtin.set_fact:
+    demo_group: 'demo-group{{ 9999 | random }}'
 - name: Generated tests
   ansible.builtin.include_tasks: autogen.yml
   args:
