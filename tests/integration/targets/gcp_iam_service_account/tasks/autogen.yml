@@ -108,6 +108,9 @@
   until: "results.name is undefined"
   retries: 10
   delay: 10
+- name: DEBUG
+  ansible.builtin.debug:
+    var: results
 - name: Verify that deletion succeeded
   ansible.builtin.assert:
     that:
