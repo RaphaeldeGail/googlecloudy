@@ -157,20 +157,20 @@ def main():
         if state == 'present':
             if difference:
                 if module.check_mode:
-                    module.exit_json(changed=False, before=fetch, action=update, diff=difference)
+                    module.exit_json(changed=False, before=fetch, action='update', diff=difference)
                 update(module, self_link(module))
                 fetch = fetch_resource(module, self_link(module), False)['result']
                 changed = True
         else:
             if module.check_mode:
-                module.exit_json(changed=False, before=fetch, action=delete)
+                module.exit_json(changed=False, before=fetch, action='delete')
             delete(module, self_link(module))
             fetch = {}
             changed = True
     else:
         if state == 'present':
             if module.check_mode:
-                module.exit_json(changed=False, before=fetch, action=create)
+                module.exit_json(changed=False, before=fetch, action='create')
             fetch = create(module, collection(module))
             changed = True
         else:
