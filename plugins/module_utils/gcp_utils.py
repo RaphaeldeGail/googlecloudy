@@ -206,6 +206,9 @@ def return_if_object(module, response, err_path=('error', 'message'), allow_not_
     if navigate_hash(result, err_path):
         module.fail_json(msg=navigate_hash(result, err_path))
 
+    if isinstance(result, type(None)):
+        module.fail_json(msg='Resource response is empty: status code %s at URL %s' % (response.status_code, response.url))
+
     return result
 
 
