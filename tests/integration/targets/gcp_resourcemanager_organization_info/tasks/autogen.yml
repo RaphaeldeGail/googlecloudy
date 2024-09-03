@@ -1,0 +1,19 @@
+#----------------------------------------------------------
+- name: Gets information about an existing organization
+  raphaeldegail.googlecloudy.gcp_resourcemanager_organization_info:
+    domain: '{{ gcp_domain }}'
+  register: results
+- name: Verify that command succeeded
+  ansible.builtin.assert:
+    that:
+      - results['resources'] | length > 0
+      - "results['resources'][0]['name'] is defined"
+#-----------------------------------------------------------
+- name: Gets information about a missing organization
+  raphaeldegail.googlecloudy.gcp_resourcemanager_organization_info:
+    domain: 'thisdomaindoesnotexist.com'
+  register: results
+- name: Verify that command succeeded
+  ansible.builtin.assert:
+    that:
+      - results['resources'] | length == 0
