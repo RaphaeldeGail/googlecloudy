@@ -121,11 +121,19 @@ def search_list(module, link):
 def return_if_object(module, response):
     # If not found, return nothing.
     if response.status_code == 404:
-        return None
+        return {
+            'result': None,
+            'status_code': response.status_code,
+            'url': response.url
+        }
 
     # If no content, return nothing.
     if response.status_code == 204:
-        return None
+        return {
+            'result': None,
+            'status_code': response.status_code,
+            'url': response.url
+        }
 
     try:
         module.raise_for_status(response)
@@ -136,7 +144,13 @@ def return_if_object(module, response):
     if navigate_hash(result, ['error', 'errors']):
         module.fail_json(msg=navigate_hash(result, ['error', 'errors']))
 
-    return result
+    full_result = {
+        'result': result,
+        'status_code': response.status_code,
+        'url': response.url
+    }
+
+    return full_result
 
 
 def collection(module):

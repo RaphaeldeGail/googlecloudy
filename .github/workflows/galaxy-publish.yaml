@@ -2,7 +2,7 @@
 name: Upload release to Galaxy
 on:
   release:
-    types: [created, published, released]
+    types: [released]
 env:
   PYTHON_VERSION: '3.11'
 jobs:
