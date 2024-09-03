@@ -157,13 +157,13 @@ def main():
     if not module.params['scopes']:
         module.params['scopes'] = ['https://www.googleapis.com/auth/cloud-billing']
 
-    fetch = fetch_resource(module, f'{self_link(module)}:getIamPolicy', False)
+    fetch = fetch_resource(module, f'{self_link(module)}:getIamPolicy', False)['result']
     changed = False
 
     difference = list_differences(resource_to_request(module).get('policy'), response_to_hash(fetch))
     if difference:
         set(module, self_link(module))
-        fetch = fetch_resource(module, f'{self_link(module)}:getIamPolicy', False)
+        fetch = fetch_resource(module, f'{self_link(module)}:getIamPolicy', False)['result']
         changed = True
 
     fetch.update({'changed': changed})
@@ -174,7 +174,7 @@ def main():
 
 def set(module, link):
     auth = GcpSession(module, 'iam')
-    return return_if_object(module, auth.post(f'{link}:setIamPolicy', resource_to_request(module)))
+    return return_if_object(module, auth.post(f'{link}:setIamPolicy', resource_to_request(module)))['result']
 
 
 def resource_to_request(module):

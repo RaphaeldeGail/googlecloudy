@@ -246,7 +246,7 @@ def main():
 
     state = module.params['state']
 
-    fetch = fetch_resource(module, self_link(module))
+    fetch = fetch_resource(module, self_link(module), True)['result']
     changed = False
     difference = None
 
@@ -257,7 +257,7 @@ def main():
             difference = list_differences(resource_to_request(module), response_to_hash(fetch))
             if difference:
                 update(module, self_link(module))
-                fetch = fetch_resource(module, self_link(module))
+                fetch = fetch_resource(module, self_link(module), False)['result']
                 changed = True
         elif fetch.get('state') == ACTIVE:
             delete(module, self_link(module))
@@ -266,7 +266,7 @@ def main():
     else:
         if state == 'present':
             create(module, collection(module))
-            fetch = fetch_resource(module, self_link(module))
+            fetch = fetch_resource(module, self_link(module), False)['result']
             changed = True
         else:
             fetch = {}

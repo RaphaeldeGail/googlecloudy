@@ -284,7 +284,8 @@ def main():
                 resource_type=dict(default='USER', choices=['USER'], type='str'),
                 query=dict(type='str')
             ))
-        )
+        ),
+        supports_check_mode=True
     )
 
     if not module.params['scopes']:
@@ -301,18 +302,26 @@ def main():
         if state == 'present':
             difference = list_differences(resource_to_request(module), response_to_hash(fetch))
             if difference:
+                if module.check_mode:
+                    module.exit_json(changed=False, before=fetch, action='update', diff=difference)
                 update(module, self_link(module))
-                fetch = fetch_resource(module, self_link(module), False)
+                fetch = fetch_resource(module, self_link(module), False)['result']
                 changed = True
         else:
+            if module.check_mode:
+                module.exit_json(changed=False, before=fetch, action='delete', diff=difference)
             delete(module, self_link(module))
             fetch = {}
             changed = True
     else:
         if state == 'present':
+            if module.check_mode:
+                module.exit_json(changed=False, before=fetch, action='create', diff=difference)
             fetch = create(module, collection(module))
             changed = True
         else:
+            if module.check_mode:
+                module.exit_json(changed=False, before=fetch, action=None, diff=difference)
             fetch = {}
 
     fetch.update({'changed': changed})

@@ -245,7 +245,7 @@ def main():
         module.params['scopes'] = ['https://www.googleapis.com/auth/cloud-identity.groups.readonly']
 
     if module.params.get('name'):
-        fetch = fetch_resource(module, self_link(module), True)
+        fetch = fetch_resource(module, self_link(module), True)['result']
     else:
         fetch = fetch_by_name(module, collection(module))
     changed = False

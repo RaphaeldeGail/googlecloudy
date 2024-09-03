@@ -144,7 +144,7 @@ def get(module, link):
         module,
         auth.post(f'{link}:getIamPolicy'),
         allow_not_found=False
-    )
+    )['result']
 
 
 def self_link(module):

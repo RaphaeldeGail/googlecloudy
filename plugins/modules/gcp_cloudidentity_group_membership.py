@@ -248,7 +248,7 @@ def main():
             difference = list_differences(resource_to_request(module), response_to_hash(fetch))
             if difference:
                 update(module, difference, self_link(module))
-                fetch = fetch_resource(module, self_link(module))
+                fetch = fetch_resource(module, self_link(module))['result']
                 changed = True
         else:
             delete(module, self_link(module))
@@ -305,7 +305,7 @@ def update(module, difference, link):
         } for role in difference.get('add').get('roles')],
         'removeRoles': [role.get('name') for role in difference.get('remove').get('roles')],
     }
-    return return_if_object(module, auth.post(f'{link}:modifyMembershipRoles', remove_nones(update)))
+    return return_if_object(module, auth.post(f'{link}:modifyMembershipRoles', remove_nones(update)))['result']
 
 
 def delete(module, link):

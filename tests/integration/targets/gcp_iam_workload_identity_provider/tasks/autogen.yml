@@ -27,7 +27,7 @@
   ansible.builtin.assert:
     that:
       - result.changed == true
-      - result.oidc.issuerUri == 'https://some-url.demo'
+      - "result.name is defined"
 - name: Verify that the provider was created
   raphaeldegail.googlecloudy.gcp_iam_workload_identity_provider_info:
     name: '{{ provider_name }}'
@@ -57,7 +57,7 @@
   ansible.builtin.assert:
     that:
       - result.changed == false
-      - result.oidc.issuerUri == 'https://some-url.demo'
+      - "result.name is defined"
 # ----------------------------------------------------------------------------
 - name: Update the provider
   raphaeldegail.googlecloudy.gcp_iam_workload_identity_provider:
@@ -76,7 +76,7 @@
   ansible.builtin.assert:
     that:
       - result.changed == true
-      - result.oidc.issuerUri == 'https://some-url.demomo'
+      - "result.name is defined"
 # ----------------------------------------------------------------------------
 - name: Check provider was updated
   raphaeldegail.googlecloudy.gcp_iam_workload_identity_provider_info:

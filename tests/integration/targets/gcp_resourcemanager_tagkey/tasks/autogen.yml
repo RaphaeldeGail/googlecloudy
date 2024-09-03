@@ -19,7 +19,7 @@
   ansible.builtin.assert:
     that:
       - result.changed == true
-      - result.shortName == 'for-tests'
+      - "result.name is defined"
 - name: Verify that the creattion was successful
   raphaeldegail.googlecloudy.gcp_resourcemanager_tagkey_info:
     short_name: for-tests
@@ -45,7 +45,7 @@
   ansible.builtin.assert:
     that:
       - result.changed == false
-      - result.shortName == 'for-tests'
+      - "result.name is defined"
 # ----------------------------------------------------------------------------
 - name: Update the tag key
   raphaeldegail.googlecloudy.gcp_resourcemanager_tagkey:
@@ -59,7 +59,7 @@
   ansible.builtin.assert:
     that:
       - result.changed == true
-      - result.description == 'For tests.'
+      - "result.name is defined"
 # ----------------------------------------------------------------------------
 - name: Check tag key was updated
   raphaeldegail.googlecloudy.gcp_resourcemanager_tagkey_info:

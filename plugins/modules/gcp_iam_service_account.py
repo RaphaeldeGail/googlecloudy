@@ -139,7 +139,8 @@ def main():
             name=dict(type='str'),
             display_name=dict(type='str'),
             project_id=dict(required=True, type='str')
-        )
+        ),
+        supports_check_mode=True
     )
 
     if not module.params['scopes']:
@@ -147,7 +148,7 @@ def main():
 
     state = module.params['state']
 
-    fetch = fetch_resource(module, self_link(module))
+    fetch = fetch_resource(module, self_link(module), True)['result']
     changed = False
     difference = None
 
@@ -155,18 +156,26 @@ def main():
         difference = list_differences(resource_to_request(module), response_to_hash(fetch))
         if state == 'present':
             if difference:
+                if module.check_mode:
+                    module.exit_json(changed=False, before=fetch, action='update', diff=difference)
                 update(module, self_link(module))
-                fetch = fetch_resource(module, self_link(module), False)
+                fetch = fetch_resource(module, self_link(module), False)['result']
                 changed = True
         else:
+            if module.check_mode:
+                module.exit_json(changed=False, before=fetch, action='delete')
             delete(module, self_link(module))
             fetch = {}
             changed = True
     else:
         if state == 'present':
+            if module.check_mode:
+                module.exit_json(changed=False, before=fetch, action='create')
             fetch = create(module, collection(module))
             changed = True
         else:
+            if module.check_mode:
+                module.exit_json(changed=False, before=fetch, action=None)
             fetch = {}
 
     fetch.update({'changed': changed})
@@ -177,17 +186,17 @@ def main():
 
 def create(module, link):
     auth = GcpSession(module, 'iam')
-    return return_if_object(module, auth.post(link, encode_request(resource_to_request(module))), err_path=['error', 'errors'])
+    return return_if_object(module, auth.post(link, encode_request(resource_to_request(module))), err_path=['error', 'errors'])['result']
 
 
 def update(module, link):
     auth = GcpSession(module, 'iam')
-    return return_if_object(module, auth.put(link, resource_to_request(module)), err_path=['error', 'errors'])
+    return return_if_object(module, auth.put(link, resource_to_request(module)), err_path=['error', 'errors'])['result']
 
 
 def delete(module, link):
     auth = GcpSession(module, 'iam')
-    return return_if_object(module, auth.delete(link), err_path=['error', 'errors'])
+    return return_if_object(module, auth.delete(link), err_path=['error', 'errors'])['result']
 
 
 def resource_to_request(module):
